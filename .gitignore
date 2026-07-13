@@ -1,0 +1,24 @@
+node_modules
+dist
+out
+.DS_Store
+.eslintcache
+*.log*
+
+# Build artifacts
+*.dmg
+*.zip
+release/
+
+# Secrets — never commit (Gmail OAuth tokens, Gemini API key, etc.)
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+credentials.json
+client_secret*.json
+token*.json
+tokens/
+secrets*.json
+.cache/
