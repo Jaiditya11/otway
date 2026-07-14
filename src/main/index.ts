@@ -44,6 +44,8 @@ function createPopover(): BrowserWindow {
   // Click-away closes the popover.
   win.on('blur', () => {
     if (win.webContents.isDevToolsOpened()) return
+    // Dev aid: OTWAY_DEV_KEEP_OPEN keeps the panel pinned so it can be inspected.
+    if (process.env.OTWAY_DEV_KEEP_OPEN) return
     win.hide()
     lastHiddenAt = Date.now()
   })
@@ -123,6 +125,9 @@ app.whenReady().then(() => {
   tray.setToolTip('Otway')
   tray.on('click', togglePopover)
   tray.on('right-click', () => tray?.popUpContextMenu(buildContextMenu()))
+
+  // Dev aid: show the panel immediately so it can be inspected without clicking.
+  if (process.env.OTWAY_DEV_KEEP_OPEN) showPopover()
 })
 
 // The app lives in the menu bar; hiding the popover must not quit it.
