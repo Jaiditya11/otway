@@ -1,13 +1,20 @@
 import { useCallback, useEffect, useState } from 'react'
-import type { Order } from '../../shared/types'
+import type { Order, OrderStatus } from '../../shared/types'
 import OrderForm, { type OrderFormValues } from './components/OrderForm'
 import OrderList from './components/OrderList'
+import ManageData from './components/ManageData'
 
 type View = { mode: 'list' } | { mode: 'add' } | { mode: 'edit'; order: Order }
+type Tab = 'active' | 'pickedup'
+
+// Active = anything not yet with you (stages 1–4); Picked up = the stage-5 archive.
+const ACTIVE_STATUSES: readonly OrderStatus[] = ['Ordered', 'OnTheWay', 'Delivered', 'AtOffice']
+const PICKEDUP_STATUSES: readonly OrderStatus[] = ['WithMe']
 
 function App(): React.JSX.Element {
   const [orders, setOrders] = useState<Order[]>([])
   const [view, setView] = useState<View>({ mode: 'list' })
+  const [tab, setTab] = useState<Tab>('active')
 
   const refresh = useCallback(async (): Promise<void> => {
     setOrders(await window.otway.list())
@@ -51,30 +58,86 @@ function App(): React.JSX.Element {
     [refresh]
   )
 
-  return (
-    <div className="panel">
-      <header className="panel__header">
-        <span className="panel__title">Otway</span>
-        {view.mode === 'list' && (
-          <button className="btn btn--add" onClick={() => setView({ mode: 'add' })}>
-            + Add
-          </button>
-        )}
-      </header>
-      <main className="panel__body">
-        {view.mode === 'list' ? (
-          <OrderList
-            orders={orders}
-            onAdvance={handleAdvance}
-            onEdit={(order) => setView({ mode: 'edit', order })}
-            onDelete={handleDelete}
-          />
-        ) : (
+  const handleClearPickedUp = useCallback(async (): Promise<void> => {
+    await window.otway.clearPickedUp()
+    await refresh()
+  }, [refresh])
+
+  const handleResetAll = useCallback(async (): Promise<void> => {
+    await window.otway.resetAll()
+    await refresh()
+  }, [refresh])
+
+  const pickedUpCount = orders.filter((o) => o.status === 'WithMe').length
+
+  if (view.mode !== 'list') {
+    return (
+      <div className="panel">
+        <header className="panel__header">
+          <span className="panel__title">{view.mode === 'edit' ? 'Edit order' : 'Add order'}</span>
+        </header>
+        <main className="panel__body">
           <OrderForm
             initial={view.mode === 'edit' ? view.order : undefined}
             onSave={handleSave}
             onCancel={() => setView({ mode: 'list' })}
           />
+        </main>
+      </div>
+    )
+  }
+
+  return (
+    <div className="panel">
+      <header className="panel__header">
+        <span className="panel__title">Otway</span>
+        <button className="btn btn--add" onClick={() => setView({ mode: 'add' })}>
+          + Add
+        </button>
+      </header>
+      <nav className="tabs">
+        <button
+          className={`tab ${tab === 'active' ? 'tab--active' : ''}`}
+          onClick={() => setTab('active')}
+        >
+          Active
+        </button>
+        <button
+          className={`tab ${tab === 'pickedup' ? 'tab--active' : ''}`}
+          onClick={() => setTab('pickedup')}
+        >
+          Picked up
+          {pickedUpCount > 0 && <span className="tab__count">{pickedUpCount}</span>}
+        </button>
+      </nav>
+      <main className="panel__body">
+        {tab === 'active' ? (
+          <OrderList
+            orders={orders}
+            statuses={ACTIVE_STATUSES}
+            emptyText="Nothing on the way — you're all caught up."
+            onAdvance={handleAdvance}
+            onEdit={(order) => setView({ mode: 'edit', order })}
+            onDelete={handleDelete}
+          />
+        ) : (
+          <>
+            <OrderList
+              orders={orders}
+              statuses={PICKEDUP_STATUSES}
+              emptyText="No picked-up orders yet."
+              onAdvance={handleAdvance}
+              onEdit={(order) => setView({ mode: 'edit', order })}
+              onDelete={handleDelete}
+            />
+            {orders.length > 0 && (
+              <ManageData
+                pickedUpCount={pickedUpCount}
+                onClearPickedUp={handleClearPickedUp}
+                onResetAll={handleResetAll}
+              />
+            )}
+          </>
         )}
       </main>
     </div>

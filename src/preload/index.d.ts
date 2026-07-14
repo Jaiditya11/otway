@@ -7,6 +7,8 @@ export interface OtwayApi {
   update: (id: string, patch: OrderPatch) => Promise<Order | null>
   advance: (id: string) => Promise<StatusChange>
   remove: (id: string) => Promise<boolean>
+  clearPickedUp: () => Promise<number>
+  resetAll: () => Promise<void>
 }
 
 declare global {

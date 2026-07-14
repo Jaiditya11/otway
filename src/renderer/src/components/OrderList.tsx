@@ -1,9 +1,11 @@
 import { useState } from 'react'
-import type { Order } from '../../../shared/types'
-import { STATUS_META, STATUS_SEQUENCE } from '../../../shared/types'
+import type { Order, OrderStatus } from '../../../shared/types'
+import { STATUS_META } from '../../../shared/types'
 
 interface Props {
   orders: Order[]
+  statuses: readonly OrderStatus[]
+  emptyText: string
   onAdvance: (id: string) => void
   onEdit: (order: Order) => void
   onDelete: (id: string) => void
@@ -13,22 +15,30 @@ function formatDate(iso: string): string {
   return new Date(iso).toLocaleDateString(undefined, { month: 'short', day: 'numeric' })
 }
 
-function OrderList({ orders, onAdvance, onEdit, onDelete }: Props): React.JSX.Element {
+function OrderList({
+  orders,
+  statuses,
+  emptyText,
+  onAdvance,
+  onEdit,
+  onDelete
+}: Props): React.JSX.Element {
   const [confirmId, setConfirmId] = useState<string | null>(null)
 
-  if (orders.length === 0) {
+  const visible = orders.filter((o) => statuses.includes(o.status))
+  if (visible.length === 0) {
     return (
       <div className="empty">
         <div className="empty__icon">📦</div>
-        <p className="empty__text">Nothing here yet — add your first order.</p>
+        <p className="empty__text">{emptyText}</p>
       </div>
     )
   }
 
   return (
     <div className="list">
-      {STATUS_SEQUENCE.map((status) => {
-        const group = orders.filter((o) => o.status === status)
+      {statuses.map((status) => {
+        const group = visible.filter((o) => o.status === status)
         if (group.length === 0) return null
         return (
           <section key={status} className="group">
