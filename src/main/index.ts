@@ -3,6 +3,7 @@ import { join } from 'path'
 import { electronApp, optimizer, is } from '@electron-toolkit/utils'
 import { createTrayIcon } from './tray-icon'
 import { OrderStore } from './store'
+import { registerOrderIpc } from './ipc'
 
 // Set before whenReady so getPath('userData') resolves to
 // ~/Library/Application Support/Otway (PRD §4).
@@ -105,6 +106,7 @@ app.whenReady().then(() => {
   // Load persisted orders from disk (created on first write).
   store = new OrderStore(join(app.getPath('userData'), 'orders.json'))
   console.log(`[otway] loaded ${store.getOrders().length} order(s) from disk`)
+  registerOrderIpc(store)
 
   app.on('browser-window-created', (_, window) => {
     optimizer.watchWindowShortcuts(window)

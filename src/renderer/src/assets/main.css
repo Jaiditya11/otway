@@ -2,19 +2,29 @@
   color-scheme: light dark;
 
   --otway-bg: #f5f5f7;
-  --otway-header-bg: rgba(255, 255, 255, 0.7);
+  --otway-header-bg: rgba(255, 255, 255, 0.72);
+  --otway-row-bg: rgba(0, 0, 0, 0.03);
   --otway-border: rgba(0, 0, 0, 0.1);
   --otway-text: #1c1c1e;
   --otway-text-dim: #8a8a8e;
+  --otway-accent: #0a84ff;
+  --otway-danger: #ff3b30;
+  --otway-control-bg: rgba(0, 0, 0, 0.06);
+  --otway-control-hover: rgba(0, 0, 0, 0.12);
 }
 
 @media (prefers-color-scheme: dark) {
   :root {
     --otway-bg: #1e1e1e;
-    --otway-header-bg: rgba(40, 40, 42, 0.7);
+    --otway-header-bg: rgba(40, 40, 42, 0.72);
+    --otway-row-bg: rgba(255, 255, 255, 0.04);
     --otway-border: rgba(255, 255, 255, 0.1);
     --otway-text: #f5f5f7;
     --otway-text-dim: #8e8e93;
+    --otway-accent: #0a84ff;
+    --otway-danger: #ff453a;
+    --otway-control-bg: rgba(255, 255, 255, 0.08);
+    --otway-control-hover: rgba(255, 255, 255, 0.16);
   }
 }
 
@@ -32,6 +42,7 @@ body,
 body {
   font-family:
     -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+  font-size: 13px;
   color: var(--otway-text);
   background: var(--otway-bg);
   overflow: hidden;
@@ -48,7 +59,8 @@ body {
 .panel__header {
   display: flex;
   align-items: center;
-  padding: 10px 16px;
+  justify-content: space-between;
+  padding: 9px 12px 9px 16px;
   background: var(--otway-header-bg);
   border-bottom: 1px solid var(--otway-border);
   backdrop-filter: blur(20px);
@@ -63,13 +75,210 @@ body {
 
 .panel__body {
   flex: 1;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 20px;
+  overflow-y: auto;
+  padding: 8px;
 }
 
+/* --- buttons --- */
+.btn {
+  font: inherit;
+  font-size: 12px;
+  padding: 4px 10px;
+  border-radius: 6px;
+  border: none;
+  background: var(--otway-control-bg);
+  color: var(--otway-text);
+  cursor: pointer;
+}
+
+.btn:hover {
+  background: var(--otway-control-hover);
+}
+
+.btn:disabled {
+  opacity: 0.4;
+  cursor: default;
+}
+
+.btn--add {
+  font-weight: 600;
+}
+
+.btn--primary {
+  background: var(--otway-accent);
+  color: #fff;
+}
+
+.btn--primary:hover {
+  background: var(--otway-accent);
+  filter: brightness(1.08);
+}
+
+.btn--danger {
+  background: var(--otway-danger);
+  color: #fff;
+}
+
+.icon-btn {
+  font: inherit;
+  font-size: 13px;
+  width: 24px;
+  height: 24px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  border-radius: 6px;
+  background: transparent;
+  color: var(--otway-text-dim);
+  cursor: pointer;
+}
+
+.icon-btn:hover {
+  background: var(--otway-control-bg);
+  color: var(--otway-text);
+}
+
+/* --- list / groups / rows --- */
+.list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.group__header {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin: 4px 6px 6px;
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.4px;
+  color: var(--otway-text-dim);
+}
+
+.group__count {
+  margin-left: auto;
+  font-variant-numeric: tabular-nums;
+}
+
+.dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.dot--Ordered {
+  background: #8e8e93;
+}
+.dot--OnTheWay {
+  background: #0a84ff;
+}
+.dot--Delivered {
+  background: #bf5af2;
+}
+.dot--AtOffice {
+  background: #ff9f0a;
+}
+.dot--WithMe {
+  background: #30d158;
+}
+
+.row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 10px;
+  border-radius: 8px;
+  background: var(--otway-row-bg);
+  margin-bottom: 4px;
+}
+
+.row__main {
+  flex: 1;
+  min-width: 0;
+}
+
+.row__title {
+  font-weight: 500;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.row__meta {
+  font-size: 11px;
+  color: var(--otway-text-dim);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.row__actions {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  flex-shrink: 0;
+}
+
+/* --- form --- */
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 6px;
+}
+
+.form__label {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--otway-text-dim);
+}
+
+.form__optional {
+  font-weight: 400;
+  text-transform: none;
+}
+
+.form__input {
+  font: inherit;
+  font-size: 13px;
+  font-weight: 400;
+  color: var(--otway-text);
+  padding: 7px 9px;
+  border-radius: 7px;
+  border: 1px solid var(--otway-border);
+  background: var(--otway-bg);
+}
+
+.form__input:focus {
+  outline: none;
+  border-color: var(--otway-accent);
+}
+
+.form__textarea {
+  resize: none;
+}
+
+.form__actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+  margin-top: 2px;
+}
+
+/* --- empty state --- */
 .empty {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
   text-align: center;
 }
 
