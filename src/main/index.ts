@@ -94,6 +94,14 @@ function togglePopover(): void {
   showPopover()
 }
 
+// Menu-bar count badge: how many orders are waiting at the office to be
+// picked up (PRD Phase 3). Blank when there are none.
+function updateTrayBadge(): void {
+  if (!tray) return
+  const waiting = store.getOrders().filter((o) => o.status === 'AtOffice').length
+  tray.setTitle(waiting > 0 ? ` ${waiting}` : '')
+}
+
 function buildContextMenu(): Menu {
   return Menu.buildFromTemplate([
     { label: 'Open Otway', click: () => showPopover() },
@@ -108,7 +116,7 @@ app.whenReady().then(() => {
   // Load persisted orders from disk (created on first write).
   store = new OrderStore(join(app.getPath('userData'), 'orders.json'))
   console.log(`[otway] loaded ${store.getOrders().length} order(s) from disk`)
-  registerOrderIpc(store)
+  registerOrderIpc(store, updateTrayBadge)
 
   app.on('browser-window-created', (_, window) => {
     optimizer.watchWindowShortcuts(window)
@@ -125,6 +133,7 @@ app.whenReady().then(() => {
   tray.setToolTip('Otway')
   tray.on('click', togglePopover)
   tray.on('right-click', () => tray?.popUpContextMenu(buildContextMenu()))
+  updateTrayBadge()
 
   // Dev aid: show the panel immediately so it can be inspected without clicking.
   if (process.env.OTWAY_DEV_KEEP_OPEN) showPopover()

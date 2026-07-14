@@ -9,7 +9,9 @@ const otway = {
   update: (id: string, patch: OrderPatch): Promise<Order | null> =>
     ipcRenderer.invoke('orders:update', id, patch),
   advance: (id: string): Promise<StatusChange> => ipcRenderer.invoke('orders:advance', id),
-  remove: (id: string): Promise<boolean> => ipcRenderer.invoke('orders:remove', id)
+  remove: (id: string): Promise<boolean> => ipcRenderer.invoke('orders:remove', id),
+  clearPickedUp: (): Promise<number> => ipcRenderer.invoke('orders:clearPickedUp'),
+  resetAll: (): Promise<void> => ipcRenderer.invoke('orders:resetAll')
 }
 
 // Use `contextBridge` APIs to expose Electron APIs to
