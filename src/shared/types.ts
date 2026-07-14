@@ -47,6 +47,12 @@ export interface StatusChange {
   applied: boolean
 }
 
+// Gmail connection state surfaced to the renderer.
+export interface GmailStatus {
+  connected: boolean
+  error?: string
+}
+
 // Stages in ascending rank order; index 0 → rank 1.
 export const STATUS_SEQUENCE: readonly OrderStatus[] = [
   'Ordered',

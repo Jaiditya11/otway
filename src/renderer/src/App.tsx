@@ -3,8 +3,10 @@ import type { Order, OrderStatus } from '../../shared/types'
 import OrderForm, { type OrderFormValues } from './components/OrderForm'
 import OrderList from './components/OrderList'
 import ManageData from './components/ManageData'
+import Settings from './components/Settings'
 
-type View = { mode: 'list' } | { mode: 'add' } | { mode: 'edit'; order: Order }
+type View =
+  { mode: 'list' } | { mode: 'add' } | { mode: 'edit'; order: Order } | { mode: 'settings' }
 type Tab = 'active' | 'pickedup'
 
 // Active = anything not yet with you (stages 1–4); Picked up = the stage-5 archive.
@@ -70,7 +72,20 @@ function App(): React.JSX.Element {
 
   const pickedUpCount = orders.filter((o) => o.status === 'WithMe').length
 
-  if (view.mode !== 'list') {
+  if (view.mode === 'settings') {
+    return (
+      <div className="panel">
+        <header className="panel__header">
+          <span className="panel__title">Settings</span>
+        </header>
+        <main className="panel__body">
+          <Settings onClose={() => setView({ mode: 'list' })} />
+        </main>
+      </div>
+    )
+  }
+
+  if (view.mode === 'add' || view.mode === 'edit') {
     return (
       <div className="panel">
         <header className="panel__header">
@@ -91,9 +106,18 @@ function App(): React.JSX.Element {
     <div className="panel">
       <header className="panel__header">
         <span className="panel__title">Otway</span>
-        <button className="btn btn--add" onClick={() => setView({ mode: 'add' })}>
-          + Add
-        </button>
+        <div className="panel__actions">
+          <button
+            className="icon-btn"
+            title="Settings"
+            onClick={() => setView({ mode: 'settings' })}
+          >
+            ⚙
+          </button>
+          <button className="btn btn--add" onClick={() => setView({ mode: 'add' })}>
+            + Add
+          </button>
+        </div>
       </header>
       <nav className="tabs">
         <button

@@ -1,5 +1,5 @@
 import { ElectronAPI } from '@electron-toolkit/preload'
-import type { NewOrderInput, Order, OrderPatch, StatusChange } from '../shared/types'
+import type { GmailStatus, NewOrderInput, Order, OrderPatch, StatusChange } from '../shared/types'
 
 export interface OtwayApi {
   list: () => Promise<Order[]>
@@ -9,6 +9,11 @@ export interface OtwayApi {
   remove: (id: string) => Promise<boolean>
   clearPickedUp: () => Promise<number>
   resetAll: () => Promise<void>
+  gmail: {
+    status: () => Promise<GmailStatus>
+    connect: () => Promise<GmailStatus>
+    disconnect: () => Promise<GmailStatus>
+  }
 }
 
 declare global {
