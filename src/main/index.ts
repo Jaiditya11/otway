@@ -5,6 +5,7 @@ import { createTrayIcon } from './tray-icon'
 import { OrderStore } from './store'
 import { registerOrderIpc } from './ipc'
 import { registerGmailIpc } from './gmail/auth'
+import { fetchNewPurchaseEmails } from './gmail/fetch'
 
 // Set before whenReady so getPath('userData') resolves to
 // ~/Library/Application Support/Otway (PRD §4).
@@ -119,6 +120,18 @@ app.whenReady().then(() => {
   console.log(`[otway] loaded ${store.getOrders().length} order(s) from disk`)
   registerOrderIpc(store, updateTrayBadge)
   registerGmailIpc()
+
+  // Day 7: on launch, log the new Purchases emails to verify the fetch pipeline.
+  // (Matching them into orders comes later; this just proves we can read them.)
+  void fetchNewPurchaseEmails(store)
+    .then((emails) => {
+      console.log(`[otway] fetched ${emails.length} new Purchases email(s)`)
+      for (const email of emails) {
+        console.log(`  - ${email.date} | ${email.from} | ${email.subject}`)
+        console.log(`    ${email.text.slice(0, 120)}`)
+      }
+    })
+    .catch((err) => console.error('[otway] Purchases fetch failed:', err))
 
   app.on('browser-window-created', (_, window) => {
     optimizer.watchWindowShortcuts(window)
