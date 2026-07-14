@@ -1,71 +1,16 @@
 import { randomUUID } from 'node:crypto'
 import { existsSync, mkdirSync, readFileSync, renameSync, writeFileSync } from 'node:fs'
 import { dirname } from 'node:path'
-
-// The five pipeline stages (PRD §3.1). Status can only ever advance.
-export type OrderStatus = 'Ordered' | 'OnTheWay' | 'Delivered' | 'AtOffice' | 'WithMe'
-
-export interface Order {
-  id: string
-  title: string
-  source: string
-  status: OrderStatus
-  statusRank: number
-  orderNumber?: string
-  trackingNumber?: string
-  orderedDate: string // ISO 8601
-  expectedDate?: string // ISO 8601
-  lastUpdated: string // ISO 8601
-  notes?: string
-  sourceEmailId?: string // Gmail message id that last updated it
-}
-
-// Stages in ascending rank order; index 0 → rank 1.
-export const STATUS_SEQUENCE: readonly OrderStatus[] = [
-  'Ordered',
-  'OnTheWay',
-  'Delivered',
-  'AtOffice',
-  'WithMe'
-]
-
-export function rankOf(status: OrderStatus): number {
-  return STATUS_SEQUENCE.indexOf(status) + 1
-}
-
-export function statusOfRank(rank: number): OrderStatus {
-  const status = STATUS_SEQUENCE[rank - 1]
-  if (!status) throw new RangeError(`invalid status rank: ${rank}`)
-  return status
-}
-
-export interface NewOrderInput {
-  title: string
-  source: string
-  status?: OrderStatus // defaults to 'Ordered'
-  orderNumber?: string
-  trackingNumber?: string
-  orderedDate?: string
-  expectedDate?: string
-  notes?: string
-  sourceEmailId?: string
-}
-
-// Fields a user may edit by hand. Status is intentionally excluded — it only
-// changes through the forward-only methods below.
-export interface OrderPatch {
-  title?: string
-  source?: string
-  orderNumber?: string
-  trackingNumber?: string
-  expectedDate?: string
-  notes?: string
-}
-
-export interface StatusChange {
-  order?: Order
-  applied: boolean
-}
+import {
+  rankOf,
+  statusOfRank,
+  STATUS_SEQUENCE,
+  type NewOrderInput,
+  type Order,
+  type OrderPatch,
+  type OrderStatus,
+  type StatusChange
+} from '../shared/types'
 
 const CURRENT_VERSION = 1
 

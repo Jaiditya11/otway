@@ -3,6 +3,7 @@ import { join } from 'path'
 import { electronApp, optimizer, is } from '@electron-toolkit/utils'
 import { createTrayIcon } from './tray-icon'
 import { OrderStore } from './store'
+import { registerOrderIpc } from './ipc'
 
 // Set before whenReady so getPath('userData') resolves to
 // ~/Library/Application Support/Otway (PRD §4).
@@ -43,6 +44,8 @@ function createPopover(): BrowserWindow {
   // Click-away closes the popover.
   win.on('blur', () => {
     if (win.webContents.isDevToolsOpened()) return
+    // Dev aid: OTWAY_DEV_KEEP_OPEN keeps the panel pinned so it can be inspected.
+    if (process.env.OTWAY_DEV_KEEP_OPEN) return
     win.hide()
     lastHiddenAt = Date.now()
   })
@@ -105,6 +108,7 @@ app.whenReady().then(() => {
   // Load persisted orders from disk (created on first write).
   store = new OrderStore(join(app.getPath('userData'), 'orders.json'))
   console.log(`[otway] loaded ${store.getOrders().length} order(s) from disk`)
+  registerOrderIpc(store)
 
   app.on('browser-window-created', (_, window) => {
     optimizer.watchWindowShortcuts(window)
@@ -121,6 +125,9 @@ app.whenReady().then(() => {
   tray.setToolTip('Otway')
   tray.on('click', togglePopover)
   tray.on('right-click', () => tray?.popUpContextMenu(buildContextMenu()))
+
+  // Dev aid: show the panel immediately so it can be inspected without clicking.
+  if (process.env.OTWAY_DEV_KEEP_OPEN) showPopover()
 })
 
 // The app lives in the menu bar; hiding the popover must not quit it.
