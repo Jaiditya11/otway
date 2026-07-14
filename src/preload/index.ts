@@ -1,6 +1,6 @@
 import { contextBridge, ipcRenderer } from 'electron'
 import { electronAPI } from '@electron-toolkit/preload'
-import type { NewOrderInput, Order, OrderPatch, StatusChange } from '../shared/types'
+import type { GmailStatus, NewOrderInput, Order, OrderPatch, StatusChange } from '../shared/types'
 
 // Otway's order API, exposed to the renderer as window.otway.
 const otway = {
@@ -11,7 +11,12 @@ const otway = {
   advance: (id: string): Promise<StatusChange> => ipcRenderer.invoke('orders:advance', id),
   remove: (id: string): Promise<boolean> => ipcRenderer.invoke('orders:remove', id),
   clearPickedUp: (): Promise<number> => ipcRenderer.invoke('orders:clearPickedUp'),
-  resetAll: (): Promise<void> => ipcRenderer.invoke('orders:resetAll')
+  resetAll: (): Promise<void> => ipcRenderer.invoke('orders:resetAll'),
+  gmail: {
+    status: (): Promise<GmailStatus> => ipcRenderer.invoke('gmail:status'),
+    connect: (): Promise<GmailStatus> => ipcRenderer.invoke('gmail:connect'),
+    disconnect: (): Promise<GmailStatus> => ipcRenderer.invoke('gmail:disconnect')
+  }
 }
 
 // Use `contextBridge` APIs to expose Electron APIs to

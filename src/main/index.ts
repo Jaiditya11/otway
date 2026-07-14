@@ -4,6 +4,7 @@ import { electronApp, optimizer, is } from '@electron-toolkit/utils'
 import { createTrayIcon } from './tray-icon'
 import { OrderStore } from './store'
 import { registerOrderIpc } from './ipc'
+import { registerGmailIpc } from './gmail/auth'
 
 // Set before whenReady so getPath('userData') resolves to
 // ~/Library/Application Support/Otway (PRD §4).
@@ -117,6 +118,7 @@ app.whenReady().then(() => {
   store = new OrderStore(join(app.getPath('userData'), 'orders.json'))
   console.log(`[otway] loaded ${store.getOrders().length} order(s) from disk`)
   registerOrderIpc(store, updateTrayBadge)
+  registerGmailIpc()
 
   app.on('browser-window-created', (_, window) => {
     optimizer.watchWindowShortcuts(window)
