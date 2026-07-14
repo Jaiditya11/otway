@@ -2,9 +2,15 @@ import { app, BrowserWindow, Tray, Menu, screen } from 'electron'
 import { join } from 'path'
 import { electronApp, optimizer, is } from '@electron-toolkit/utils'
 import { createTrayIcon } from './tray-icon'
+import { OrderStore } from './store'
+
+// Set before whenReady so getPath('userData') resolves to
+// ~/Library/Application Support/Otway (PRD §4).
+app.setName('Otway')
 
 let tray: Tray | null = null
 let popover: BrowserWindow | null = null
+let store: OrderStore
 // Timestamp of the last blur-triggered hide, used to make clicking the tray
 // icon while the popover is open close it (rather than immediately reopen it).
 let lastHiddenAt = 0
@@ -95,6 +101,10 @@ function buildContextMenu(): Menu {
 
 app.whenReady().then(() => {
   electronApp.setAppUserModelId('app.otway')
+
+  // Load persisted orders from disk (created on first write).
+  store = new OrderStore(join(app.getPath('userData'), 'orders.json'))
+  console.log(`[otway] loaded ${store.getOrders().length} order(s) from disk`)
 
   app.on('browser-window-created', (_, window) => {
     optimizer.watchWindowShortcuts(window)
