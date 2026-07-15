@@ -18,8 +18,8 @@ let store: OrderStore
 // icon while the popover is open close it (rather than immediately reopen it).
 let lastHiddenAt = 0
 
-const POPOVER_WIDTH = 360
-const POPOVER_HEIGHT = 460
+const POPOVER_WIDTH = 380
+const POPOVER_HEIGHT = 520
 
 function createPopover(): BrowserWindow {
   const win = new BrowserWindow({
@@ -34,6 +34,12 @@ function createPopover(): BrowserWindow {
     fullscreenable: false,
     skipTaskbar: true,
     alwaysOnTop: true,
+    // Native translucent menu-bar material (like Control Center); content on top.
+    // No backgroundColor — an opaque fill would paint behind the glass and kill
+    // the translucency.
+    vibrancy: 'menu',
+    visualEffectState: 'active',
+    roundedCorners: true,
     webPreferences: {
       preload: join(__dirname, '../preload/index.js'),
       sandbox: false

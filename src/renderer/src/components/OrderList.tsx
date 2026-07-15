@@ -57,9 +57,9 @@ function OrderList({
                   </div>
                 </div>
                 {confirmId === order.id ? (
-                  <div className="row__actions">
+                  <div className="row__actions row__actions--confirm">
                     <button
-                      className="btn btn--danger"
+                      className="btn btn--danger btn--small"
                       onClick={() => {
                         onDelete(order.id)
                         setConfirmId(null)
@@ -67,7 +67,7 @@ function OrderList({
                     >
                       Delete
                     </button>
-                    <button className="btn" onClick={() => setConfirmId(null)}>
+                    <button className="btn btn--small" onClick={() => setConfirmId(null)}>
                       Cancel
                     </button>
                   </div>
