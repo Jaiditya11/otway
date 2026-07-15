@@ -114,8 +114,12 @@ function App(): React.JSX.Element {
           >
             ⚙
           </button>
-          <button className="btn btn--add" onClick={() => setView({ mode: 'add' })}>
-            + Add
+          <button
+            className="icon-btn icon-btn--add"
+            title="Add order"
+            onClick={() => setView({ mode: 'add' })}
+          >
+            +
           </button>
         </div>
       </header>
